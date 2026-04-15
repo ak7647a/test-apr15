@@ -1,0 +1,62 @@
+---
+title: "Monty Hall Simulation"
+author: "Abhishu Karki"
+date: "Jan 14, 2026"
+format: html
+knitr:
+  opts_chunk:
+    echo: true 
+    eval: true
+    message: false
+    collapse: true
+    warning: false 
+---
+
+# My Simulation
+
+I began by loading the required packages.
+
+```{r}
+# Setup ------
+library(tidyverse)
+library(knitr)
+```
+
+My next steps are to set the stage -- creating three doors -- and to set a score sheet to track results.
+
+```{r}
+## set the stage
+doors <- c('A','B','C')
+##keep score 
+results <- tibble(
+  trial <- 1:10000
+)
+```
+
+Finally I run the game. I place the prize at random, and the contestant choose a door at random. The host opens a door to reveal a goat. Then the contestants act: Marilyn switches doors while Paul does not. I repeat the game 10,000 times and record the winners in the `results` object created previously.
+
+
+```{r}
+for (i in 1:10000) {
+car <- sample(doors, 1) #puts car behind 1 door at random
+choice <- sample(doors, 1) #has a contestant choose a door
+reveal <- sample(doors[doors != car & doors != choice],1) #reveals a goat the sign [ ] helps makes a condition within a value
+switch <- sample(doors[doors !=choice & doors != reveal],1) #switch between the remaining door that hasn't already been chosen
+results[i, 'winners'] <- if_else(car == choice, "Paul wins", "Marilyn wins")}
+```
+
+# Results
+The table below presents the results of the simulation.
+
+```{r}
+outcomes <-
+  results |>
+  count(winners) |>
+  mutate(percent = n / sum(n) *100)
+
+kable(outcomes, caption = 'Results of simulation', digits = 1L)
+```
+
+In 10,000 simulations, the contestant who switches won a total of 'r results |> filter(winner == "Marilyn wins") |> nrow()` times. This is consistent with Marilyn's expectation. You should switch!
+
+
